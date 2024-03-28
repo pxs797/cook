@@ -5,18 +5,21 @@ import { useState, useRef } from 'react';
 
 export default function App() {
   const upload = useRef(null)
-  const [image, setImage] = useState('')
-  const [mimeType, setMimeType] = useState('')
+  const [image, setImage] = useState(null)
+  const [base64Img, setBase64Img] = useState('')
   const [desc, setDesc] = useState('')
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const handleImageUpload = () => {
     upload.current.click()
   }
   const handleFileUpload = async (e) => {
     const file = e.target.files[0]
-    const img = await fileToBase64(file)
-    setImage(img)
-    setMimeType(file.type)
+    const _base64Img = await fileToBase64(file)
+    setBase64Img(_base64Img)
+    const _blobImg = fileToBlob(file)
+    setImage(_blobImg)
+    reset()
   }
   const fileToBase64 = (file) => {
     return new Promise((resolve) => {
@@ -25,23 +28,37 @@ export default function App() {
       reader.readAsDataURL(file)
     })
   }
+  const fileToBlob = (file) => {
+    return file.slice(0, file.size, file.type)
+  }
   const handleAnalyze = async () => {
+    reset()
     if (!image) {
       return
     }
     try {
       setLoading(true)
+      const formData = new FormData()
+      formData.append('image', image)
       const resp = await fetch('/api/upload', {
         method: 'POST',
-        body: JSON.stringify({ data: image.split(',')[1], mimeType })
+        body: formData
       })
       const res = await resp.json()
-      setDesc(res)
+      if (res.code === 200) {
+        setDesc(res.data)
+      } else {
+        setError(res.error)
+      }
     } catch (error) {
       console.error(error)
     } finally {
       setLoading(false)
     }
+  }
+  const reset = () => {
+    setDesc('')
+    setError('')
   }
   return (
     <div>
@@ -54,13 +71,13 @@ export default function App() {
             <input className='hidden' type='file' onChange={handleFileUpload} ref={upload} />
             {
               image ?
-              <img className='w-full aspect-square object-cover' src={image} /> :
+              <img className='w-full aspect-square object-cover' src={base64Img} /> :
               <div className='w-full aspect-square flex justify-center items-center'>
                 <ImageIcon></ImageIcon>
               </div>
             }
             {
-              desc && <p className='mt-2'>{desc}</p>
+              error ? <p className='text-red-500 mt-2'>{error}</p> : desc && <p className='mt-2'>{desc}</p>
             }
             <UploadIcon className="mx-auto w-10 h-10 p-2 cursor-pointer hover:bg-slate-100" onClick={handleImageUpload}></UploadIcon>
           </div>
@@ -71,12 +88,7 @@ export default function App() {
         </div>
       </main>
       <footer className='text-center text-slate-500 mb-2'>
-        Copyright &copy; 2024
-        {' '}
-        <a href="https://github.com/pxs797" target="_blank" rel="noopener noreferrer">
-          {' '}
-          Mark Peng
-        </a>
+        Copyright &copy; 2024 Mark Peng
       </footer>
     </div>
   );
