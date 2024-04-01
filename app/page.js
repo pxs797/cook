@@ -2,6 +2,7 @@
 import Header from '@/components/ui/header';
 import '@/styles/common.css'
 import { useState, useRef } from 'react';
+import imageCompression from 'browser-image-compression';
 
 export default function App() {
   const upload = useRef(null)
@@ -15,10 +16,10 @@ export default function App() {
   }
   const handleFileUpload = async (e) => {
     const file = e.target.files[0]
-    const _base64Img = await fileToBase64(file)
-    setBase64Img(_base64Img)
-    const _blobImg = fileToBlob(file)
-    setImage(_blobImg)
+    const base64File = await fileToBase64(file)
+    setBase64Img(base64File)
+    const compressedFile = await compressFile(file)
+    setImage(compressedFile)
     reset()
   }
   const fileToBase64 = (file) => {
@@ -28,8 +29,14 @@ export default function App() {
       reader.readAsDataURL(file)
     })
   }
-  const fileToBlob = (file) => {
-    return file.slice(0, file.size, file.type)
+  const compressFile = async (file) => {
+    const options = {
+      maxSizeMB: 4.5,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    }
+    const compressedFile = await imageCompression(file, options)
+    return compressedFile
   }
   const handleAnalyze = async () => {
     reset()
