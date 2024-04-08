@@ -3,13 +3,13 @@ import Header from '@/components/ui/header';
 import '@/styles/common.css'
 import { useState, useRef } from 'react';
 import imageCompression from 'browser-image-compression';
+import { toast } from 'sonner';
 
 export default function App() {
   const upload = useRef(null)
   const [image, setImage] = useState(null)
   const [base64Img, setBase64Img] = useState('')
   const [desc, setDesc] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const handleImageUpload = () => {
     upload.current.click()
@@ -55,17 +55,16 @@ export default function App() {
       if (res.code === 200) {
         setDesc(res.data)
       } else {
-        setError(res.error)
+        toast.error(res.error)
       }
     } catch (error) {
-      console.error(error)
+      toast.error(res.error)
     } finally {
       setLoading(false)
     }
   }
   const reset = () => {
     setDesc('')
-    setError('')
   }
   return (
     <div>
@@ -84,7 +83,7 @@ export default function App() {
               </div>
             }
             {
-              error ? <p className='text-red-500 mt-2'>{error}</p> : desc && <p className='mt-2'>{desc}</p>
+              desc && <p className='mt-2'>{desc}</p>
             }
             <UploadIcon className="mx-auto w-10 h-10 p-2 cursor-pointer hover:bg-slate-100" onClick={handleImageUpload}></UploadIcon>
           </div>
