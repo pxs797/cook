@@ -78,7 +78,7 @@ export default function App() {
             {
               image ?
               <img className='w-full aspect-square object-cover' src={base64Img} /> :
-              <div className='w-full aspect-square flex justify-center items-center'>
+              <div className='w-full aspect-square flex justify-center items-center cursor-pointer' onClick={handleImageUpload}>
                 <ImageIcon></ImageIcon>
               </div>
             }
