@@ -74,7 +74,7 @@ export default function App() {
           <h2 className='font-bold text-2xl mb-2'>酷客</h2>
           <p className='mb-2'>我知道你吃了什么！</p>
           <div className='w-full h-auto p-6 pb-0 border rounded-md'>
-            <input className='hidden' type='file' onChange={handleFileUpload} ref={upload} />
+            <input className='hidden' type='file' accept='image/*' onChange={handleFileUpload} ref={upload} />
             {
               image ?
               <img className='w-full aspect-square object-cover' src={base64Img} /> :

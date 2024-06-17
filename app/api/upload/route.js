@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@fuyun/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const BASE_URL = process.env.BASE_URL
 const API_KEY = process.env.API_KEY
@@ -9,7 +9,7 @@ export async function POST(request) {
   const arrayBuffer = await image.arrayBuffer()
   const base64Img = Buffer.from(arrayBuffer).toString('base64')
   const genAI = new GoogleGenerativeAI(API_KEY, BASE_URL);    
-  const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `
     作为一名经验丰富的营养师,你的任务是分析我提供的食物图片,并给出相关的饮食建议。
